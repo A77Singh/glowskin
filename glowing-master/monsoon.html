@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bedtime Prep Essentials</title>
+    <style>
+        .bedtime-prep-essentials {
+            text-align: center;
+            padding: 20px;
+            background-color: #f8f8f8;
+        }
+
+        .section-title {
+            font-size: 24px;
+            font-weight: bold;
+            color: #4a4a4a;
+        }
+
+        .highlight {
+            color: #b57ee5;
+        }
+
+        .products-container {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .product-item {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            overflow: hidden;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #fff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .product-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .product-label {
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: rgba(0, 0, 0, 0.5);
+            color: #fff;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 14px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="bedtime-prep-essentials">
+        <h2 class="section-title"><span class="highlight">Bedtime</span> Prep Essentials</h2>
+        <div class="products-container">
+            <div class="product-item">
+                <img src="cleanser.jpg" alt="Cleansers">
+                <div class="product-label">CLEANSERS</div>
+            </div>
+            <div class="product-item">
+                <img src="toner.jpg" alt="Toners">
+                <div class="product-label">TONERS</div>
+            </div>
+            <div class="product-item">
+                <img src="serum.jpg" alt="Serums">
+                <div class="product-label">SERUMS</div>
+            </div>
+            <div class="product-item">
+                <img src="moisturiser.jpg" alt="Moisturisers">
+                <div class="product-label">MOISTURISERS</div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

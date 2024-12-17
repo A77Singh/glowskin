@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Skincare Routine Form</title>
+    <link rel="stylesheet" href="quiz.css">
+
+    <style>
+        /* Basic styles for better visibility */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        button {
+            margin: 5px;
+        }
+        #result {
+            margin-top: 20px;
+            font-weight: bold;
+        }
+        .concern-button {
+            background-color: lightgray;
+            border: 1px solid #ccc;
+            padding: 5px;
+            cursor: pointer;
+        }
+        .selected {
+            background-color: #4CAF50;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+
+    <form id="skincareForm">
+        <div id="ageGroupDiv">
+            <p>Select your age group:</p>
+            <button type="button" onclick="setAgeGroup(1)">1-18</button>
+            <button type="button" onclick="setAgeGroup(2)">18-25</button>
+            <button type="button" onclick="setAgeGroup(3)">25-40</button>
+            <button type="button" onclick="setAgeGroup(4)">Above 40</button>
+            <input type="hidden" id="ageGroup" name="ageGroup" required>
+        </div>
+
+        <div id="genderDiv" style="display: none;">
+            <p>Select your gender:</p>
+            <button type="button" onclick="setGender('male')">Male</button>
+            <button type="button" onclick="setGender('female')">Female</button>
+            <button type="button" onclick="setGender('other')">Other</button>
+            <input type="hidden" id="gender" name="gender" required>
+        </div>
+
+        <div id="skinConditionsDiv" style="display: none;">
+            <p>Do you have any skin conditions?</p>
+            <button type="button" onclick="toggleCondition('rosacea')">Rosacea</button>
+            <button type="button" onclick="toggleCondition('eczema')">Eczema</button>
+            <button type="button" onclick="toggleCondition('psoriasis')">Psoriasis</button>
+            <button type="button" onclick="setNoCondition()">None</button>
+            <input type="hidden" id="skinConditions" name="skinConditions">
+        </div>
+
+        <div id="skinTypeDiv" style="display: none;">
+            <p>What is your skin type?</p>
+            <button type="button" onclick="setSkinType('normal')">Normal</button>
+            <button type="button" onclick="setSkinType('oily')">Oily</button>
+            <button type="button" onclick="setSkinType('dry')">Dry</button>
+            <button type="button" onclick="setSkinType('combination')">Combination</button>
+            <input type="hidden" id="skinType" name="skinType" required>
+        </div>
+
+        <div id="mainConcernsDiv" style="display: none;">
+            <p>What are your main concerns? (Select all that apply)</p>
+            <button type="button" class="concern-button" onclick="toggleConcern('acne')">Acne</button>
+            <button type="button" class="concern-button" onclick="toggleConcern('dryness')">Dryness</button>
+            <button type="button" class="concern-button" onclick="toggleConcern('aging')">Aging</button>
+            <button type="button" class="concern-button" onclick="toggleConcern('sensitivity')">Sensitivity</button>
+            <button type="button" class="concern-button" onclick="toggleConcern('large pores')">Large Pores</button>
+            <button type="button" class="concern-button" onclick="toggleConcern('hyperpigmentation')">Hyperpigmentation</button>
+            <button type="button" class="concern-button" onclick="toggleConcern('fine lines')">Fine Lines</button>
+            <button type="button" class="concern-button" onclick="toggleConcern('dullness')">Dullness</button>
+            <input type="hidden" id="mainConcerns" name="mainConcerns">
+        </div>
+        
+
+
+        <button type="button" id="suggestBtn" style="display: none;" onclick="suggestRoutine()">Suggest Routine</button>
+        <button type="submit" id="submitBtn" class="unclickable" style="display: none;">Get Your Routine</button>
+    </form>
+
+    <div id="result"></div>
+
+    <script>
+        const conditions = new Set();
+        const concerns = new Set();
+        let currentStep = 0;
+
+        function setAgeGroup(group) {
+            document.getElementById('ageGroup').value = group;
+            goToNextStep('ageGroupDiv');
+        }
+
+        function setGender(value) {
+            document.getElementById('gender').value = value;
+            goToNextStep('genderDiv');
+        }
+
+        function toggleCondition(condition) {
+            if (conditions.has(condition)) {
+                conditions.delete(condition);
+            } else {
+                conditions.add(condition);
+            }
+            document.getElementById('skinConditions').value = Array.from(conditions).join(', ');
+            goToNextStep('skinConditionsDiv');
+        }
+
+        function setNoCondition() {
+            document.getElementById('skinConditions').value = 'None';
+            goToNextStep('skinConditionsDiv');
+        }
+
+        function setSkinType(type) {
+            document.getElementById('skinType').value = type;
+            goToNextStep('skinTypeDiv');
+        }
+
+        function toggleConcern(concern) {
+            if (concerns.has(concern)) {
+                concerns.delete(concern);
+                document.querySelector(`button[onclick="toggleConcern('${concern}')"]`).classList.remove('selected');
+            } else {
+                concerns.add(concern);
+                document.querySelector(`button[onclick="toggleConcern('${concern}')"]`).classList.add('selected');
+            }
+            document.getElementById('mainConcerns').value = Array.from(concerns).join(', ');
+            document.getElementById('suggestBtn').style.display = concerns.size > 0 ? 'block' : 'none';
+        }
+
+        function goToNextStep(currentDiv) {
+            document.getElementById(currentDiv).style.display = 'none';
+            currentStep++;
+            const steps = document.querySelectorAll('div[id$="Div"]');
+            if (currentStep < steps.length) {
+                steps[currentStep].style.display = 'block';
+            } else {
+                // Only show the submit button after all steps are done
+                document.getElementById('submitBtn').style.display = 'block';
+            }
+        }
+
+        function suggestRoutine() {
+            const selectedConcerns = Array.from(concerns);
+            let suggestions = "Suggested Routine:\n";
+
+            if (selectedConcerns.includes('acne')) {
+                suggestions += "- Use a gentle cleanser and a salicylic acid treatment.\n";
+            }
+            if (selectedConcerns.includes('dryness')) {
+                suggestions += "- Apply a hydrating moisturizer with hyaluronic acid.\n";
+            }
+            if (selectedConcerns.includes('aging')) {
+                suggestions += "- Incorporate retinol into your routine.\n";
+            }
+            if (selectedConcerns.includes('sensitivity')) {
+                suggestions += "- Use fragrance-free products and avoid exfoliants.\n";
+            }
+            if (selectedConcerns.includes('large pores')) {
+                suggestions += "- Use a clay mask and exfoliate regularly.\n";
+            }
+            if (selectedConcerns.includes('hyperpigmentation')) {
+                suggestions += "- Use vitamin C serum and sunscreen daily.\n";
+            }
+            if (selectedConcerns.includes('fine lines')) {
+                suggestions += "- Hydrate with peptides and consider a retinol product.\n";
+            }
+            if (selectedConcerns.includes('dullness')) {
+                suggestions += "- Use an exfoliating toner and brightening serum.\n";
+            }
+
+            document.getElementById('result').innerText = suggestions;
+        }
+
+        document.getElementById('skincareForm').onsubmit = function(event) {
+            event.preventDefault();
+            
+            const ageGroup = document.getElementById('ageGroup').value;
+            const gender = document.getElementById('gender').value;
+            const skinConditions = document.getElementById('skinConditions').value;
+            const skinType = document.getElementById('skinType').value;
+            const mainConcerns = document.getElementById('mainConcerns').value;
+
+            const resultMessage = `
+                Your Routine:
+                Age Group: ${ageGroup}
+                Gender: ${gender}
+                Skin Conditions: ${skinConditions}
+                Skin Type: ${skinType}
+                Main Concerns: ${mainConcerns}
+            `;
+
+            document.getElementById('result').innerText = resultMessage;
+        };
+    </script>
+
+</body>
+</html>
