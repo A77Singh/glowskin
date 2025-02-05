@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Skincare Quiz</title>
+    <link rel="stylesheet" href="quiz.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-image: url('../glowing-master/assets/images/background.jpg');
+            text-align: center;
+        }
+        #nextBtn, #prevBtn {
+            border-radius: 25px;
+            font-size: 20px;
+            margin: 5px;
+            padding: 10px 20px;
+            background-color: #388e3c;
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        #nextBtn:hover, #prevBtn:hover {
+            background-color: #2e7d32;
+        }
+        .quiz-container {
+            max-width: 500px;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+            margin: auto;
+        }
+        .question {
+            font-size: 18px;
+            margin-bottom: 15px;
+        }
+        .option {
+            display: flex;
+            align-items: center;
+            background: #e8f5e9;
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        .option:hover {
+            background: #c8e6c9;
+        }
+        .option input {
+            display: none;
+        }
+        .option label {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            cursor: pointer;
+        }
+        .option img {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            margin-right: 10px;
+            border: 2px solid transparent;
+        }
+        .option input:checked + label img {
+            border: 2px solid #388e3c;
+        }
+        .option span {
+            font-size: 16px;
+            font-weight: bold;
+            color: #333;
+        }
+        .hidden {
+            display: none;
+        }
+        .product-container {
+            margin-top: 20px;
+        }
+        .product-card {
+            background: #fff;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            margin-bottom: 15px;
+        }
+        .product-card img {
+            max-width: 100px;
+            border-radius: 5px;
+        }
+        .buy-link {
+            display: inline-block;
+            margin-top: 10px;
+            padding: 5px 10px;
+            background: #388e3c;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+        #results p {
+            text-align: left;
+            margin: 5px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="quiz-container">
+        <h2>Find Your Skincare Routine</h2>
+        <div id="quiz"></div>
+        <button id="prevBtn" class="hidden" onclick="prevQuestion()">Previous</button>
+        <button id="nextBtn" class="hidden" onclick="nextQuestion()">Next</button>
+        <div id="results" class="hidden"></div>
+    </div>
+
+    <script>
+        const products = {
+            "Acne": { name: "Acne Control Gel", img: "acne_gel.jpg", link: "#" },
+            "Dryness": { name: "Hydrating Moisturizer", img: "moisturizer.jpg", link: "#" },
+            "Aging": { name: "Anti-Aging Serum", img: "anti_aging.jpg", link: "#" },
+            "Sensitivity": { name: "Soothing Cream", img: "soothing_cream.jpg", link: "#" },
+            "Large Pores": { name: "Pore Minimizer", img: "pore_minimizer.jpg", link: "#" },
+            "Hyperpigmentation": { name: "Brightening Serum", img: "brightening_serum.jpg", link: "#" },
+            "Fine Lines": { name: "Wrinkle Repair Cream", img: "wrinkle_repair.jpg", link: "#" },
+            "Dullness": { name: "Radiance Booster", img: "radiance_booster.jpg", link: "#" }
+        };
+
+        const questions = [
+            { text: "What is your gender?", options: [{label: "Male", img: "male.jpg"}, {label: "Female", img: "female.jpg"}, {label: "Other", img: "other.jpg"}], required: true },
+            { text: "What is your age group?", options: [{label: "Under 18"}, {label: "18-25"}, {label: "26-35"}, {label: "36-45"}, {label: "46+"}], required: true },
+            { text: "Do you have any skin conditions?", options: [{label: "Rosacea", img: "rosacea.jpg"}, {label: "Eczema", img: "eczema.jpg"}, {label: "Psoriasis", img: "psoriasis.jpg"}, {label: "None", img: "none.jpg"}] },
+            { text: "What is your skin type?", options: [{label: "Normal", img: "normal.jpg"}, {label: "Oily", img: "oily.jpg"}, {label: "Dry", img: "dry.jpg"}, {label: "Combination", img: "combination.jpg"}], required: true },
+            { text: "What are your main concerns?", options: [{label: "Acne", img:" acne.jpg"}, {label: "Dryness", img: "dryness.jpg"}, {label: "Aging", img: "aging.jpg"}, {label: "Sensitivity", img: "sensitivity.jpg"}, {label: "Large Pores", img: "pores.jpg"}, {label: "Hyperpigmentation", img: "hyperpigmentation.jpg"}, {label: "Fine Lines", img: "wrinkle.jpg"}, {label: "Dullness", img: "dullness.jpg"}], multiple: true, required: true }
+        ];
+
+        let currentQuestion = 0;
+        const answers = [];
+
+        function loadQuestion() {
+            const current = questions[currentQuestion];
+            document.getElementById("quiz").innerHTML = `
+                <div class='question'>${current.text}${current.required ? ' <span style="color: red;">*</span>' : ''}</div>
+                <div class='options'>
+                    ${current.options.map((option, index) => `
+                        <div class='option'>
+                            <input type='${current.multiple ? "checkbox" : "radio"}' id='option${index}' name='question' onclick="selectAnswer('${option.label}', ${current.multiple})">
+                            <label for='option${index}'>
+                                ${option.img ? `<img src='${option.img}' alt='${option.label}'>` : ""}
+                                <span>${option.label}</span>
+                            </label>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+
+            document.getElementById("prevBtn").classList.toggle("hidden", currentQuestion === 0);
+        }
+
+        function selectAnswer(answer, multiple) {
+            if (multiple) {
+                if (!answers[currentQuestion]) answers[currentQuestion] = [];
+                const index = answers[currentQuestion].indexOf(answer);
+                if (index > -1) {
+                    answers[currentQuestion].splice(index, 1);
+                } else {
+                    answers[currentQuestion].push(answer);
+                }
+            } else {
+                answers[currentQuestion] = answer;
+            }
+            document.getElementById("nextBtn").classList.remove("hidden");
+        }
+
+        function nextQuestion() {
+            const current = questions[currentQuestion];
+            if (current.required && !answers[currentQuestion]) {
+                alert('Please answer this question before proceeding.');
+                return;
+            }
+
+            document.getElementById("nextBtn").classList.add("hidden");
+            currentQuestion++;
+            if (currentQuestion < questions.length) {
+                loadQuestion();
+            } else {
+                showResults();
+            }
+        }
+
+        function prevQuestion() {
+            if (currentQuestion > 0) {
+                currentQuestion--;
+                loadQuestion();
+            }
+        }
+
+        function showResults() {
+            let resultHTML = `<h3>Your Skincare Routine</h3>`;
+            answers.forEach((answer, index) => {
+                resultHTML += `<p><strong>${questions[index].text}:</strong> ${Array.isArray(answer) ? answer.join(", ") : answer}</p>`;
+            });
+
+            resultHTML += `<h3>Recommended Products</h3>`;
+            (answers[4] || []).forEach(concern => {
+                if (products[concern]) {
+                    const product = products[concern];
+                    resultHTML += `
+                        <div class='product-card'>
+                            <img src='${product.img}' alt='${product.name}'>
+                            <h4>${product.name}</h4>
+                            <a class='buy-link' href='${product.link}'>Buy Now</a>
+                        </div>
+                    `;
+                }
+            });
+
+            document.getElementById("quiz").innerHTML = "";
+            document.getElementById("results").innerHTML = resultHTML;
+            document.getElementById("results").classList.remove("hidden");
+        }
+
+        loadQuestion();
+    </script>
+</body>
+</html>
